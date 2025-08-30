@@ -692,12 +692,13 @@
     <script>
         // Firebase конфигурация (замените на свою!)
         const firebaseConfig = {
-            apiKey: "demo-api-key",
-            authDomain: "pocket-pet-demo.firebaseapp.com",
-            projectId: "pocket-pet-demo",
-            storageBucket: "pocket-pet-demo.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abcdef123456"
+            apiKey: "AIzaSyDkURLZIwVQ41iXz3LRJFIvNaHoX1zzNtE",
+            authDomain: "basedanih-70a2e.firebaseapp.com",
+            projectId: "basedanih-70a2e",
+            storageBucket: "basedanih-70a2e.firebasestorage.app",
+            messagingSenderId: "473558687341",
+            appId: "1:473558687341:web:2bb509c757efc788afa964",
+            measurementId: "G-QE2FJJP96Y"
         };
 
         // Инициализация Firebase (с проверкой на ошибки)
@@ -710,6 +711,11 @@
                 db = firebase.firestore();
                 firebaseEnabled = true;
                 console.log('Firebase подключен успешно!');
+
+                db.enablePersistence()
+                    .catch((err) => {
+                       console.log('Оффлайн режим не поддерживается:', err);
+                    });
             }
         } catch (error) {
             console.log('Firebase не подключен, работаем в автономном режиме:', error);
@@ -816,8 +822,13 @@
                     level: gameState.level,
                     petType: gameState.petType,
                     petStage: gameState.petStage,
-                    lastUpdate: Date.now()
-                }, { merge: true });
+                    lastUpdate: Date.now(),
+                    telegramId: gameState.playerId,
+                    username: window.Telegram?.WebApp?.initDataUnsafe?.user?.username || 'unknown',
+                    first_name: window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name || 'Player'
+                }, 
+
+                await db.collection('players').doc(gameState.playerId).set(playerData, { merge: true });
                 
                 console.log('Рейтинг обновлён успешно!');
             } catch (error) {
@@ -846,7 +857,8 @@
                         score: data.score || 0,
                         level: data.level || 1,
                         petType: data.petType || 'normal',
-                        petStage: data.petStage || 0
+                        petStage: data.petStage || 0,
+                        username: data.username || ''
                     });
                 });
 
@@ -922,6 +934,15 @@
             });
         });
 
+        // Автоматическая синхронизация каждые 30 секунд
+        function startAutoSync() {
+            setInterval(() => {
+                if (firebaseEnabled && gameState.playerId) {
+                    updatePlayerRating();
+                }
+            }, 30000); // Синхронизация каждые 30 секунд
+        }
+
         // Загрузка игры
         function initGame() {
             const saved = localStorage.getItem('pocketPetSave');
@@ -947,6 +968,7 @@
             updateDisplay();
             updateShop();
             startGameLoop();
+            startAutoSync();
         }
 
         // Обновление статистик за время
