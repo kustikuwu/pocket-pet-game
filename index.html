@@ -20,24 +20,78 @@
             flex-direction: column;
             color: white;
             overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .header {
             text-align: center;
-            padding: 20px;
+            padding: 15px;
             background: rgba(255,255,255,0.1);
             backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pet-info {
+            flex: 1;
         }
 
         .pet-name {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
 
         .pet-level {
-            font-size: 14px;
+            font-size: 12px;
             opacity: 0.8;
+        }
+
+        .rating-info {
+            font-size: 12px;
+            background: rgba(255,215,0,0.2);
+            padding: 8px 12px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,215,0,0.3);
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            opacity: 1;
+            border-bottom-color: white;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .tab-content {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
         }
 
         .main-container {
@@ -55,18 +109,24 @@
             flex-direction: column;
             justify-content: center;
             position: relative;
+            background: rgba(255,255,255,0.05);
+            border-radius: 25px;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .pet {
             font-size: 120px;
             animation: float 3s ease-in-out infinite;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s ease;
             filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .pet:hover {
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
         .pet.happy {
@@ -75,8 +135,34 @@
 
         .pet-status {
             margin-top: 20px;
-            font-size: 18px;
+            font-size: 16px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .pet-ability {
+            margin-top: 10px;
+            font-size: 14px;
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .room-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 25px;
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        .room-furniture {
+            position: absolute;
+            font-size: 30px;
+            pointer-events: none;
         }
 
         .stats-container {
@@ -87,27 +173,31 @@
             border: 1px solid rgba(255,255,255,0.2);
         }
 
-        .stat {
+        .stats-row {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            gap: 15px;
             margin-bottom: 15px;
         }
 
-        .stat-label {
+        .stat {
+            flex: 1;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 8px;
-            font-weight: 600;
+        }
+
+        .stat-icon {
+            font-size: 20px;
+            margin-bottom: 5px;
         }
 
         .stat-bar {
-            flex: 1;
-            margin: 0 15px;
+            width: 100%;
             height: 8px;
             background: rgba(255,255,255,0.2);
             border-radius: 4px;
             overflow: hidden;
+            margin-bottom: 5px;
         }
 
         .stat-fill {
@@ -120,6 +210,29 @@
         .happiness-fill { background: linear-gradient(90deg, #4ecdc4, #26a69a); }
         .health-fill { background: linear-gradient(90deg, #a8e6cf, #66bb6a); }
         .cleanliness-fill { background: linear-gradient(90deg, #87ceeb, #42a5f5); }
+
+        .stat-value {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .currency-bar {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .currency {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 25px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+        }
 
         .actions-container {
             display: grid;
@@ -135,16 +248,17 @@
             padding: 15px;
             color: white;
             font-weight: 600;
-            font-size: 16px;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            outline: none;
         }
 
-        .action-btn:hover {
+        .action-btn:hover:not(:disabled) {
             background: rgba(255,255,255,0.3);
             transform: translateY(-2px);
         }
@@ -158,19 +272,158 @@
             cursor: not-allowed;
         }
 
-        .coins {
-            background: rgba(255,215,0,0.2);
-            border: 1px solid rgba(255,215,0,0.5);
-            border-radius: 25px;
-            padding: 10px 15px;
+        /* Рейтинги */
+        .rating-container {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .rating-item {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 8px;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            margin-bottom: 10px;
+        }
+
+        .rating-item.own {
+            border: 2px solid rgba(255,215,0,0.5);
+            background: rgba(255,215,0,0.1);
+        }
+
+        .rating-position {
+            font-size: 18px;
             font-weight: bold;
+            min-width: 30px;
+        }
+
+        .rating-info-item {
+            flex: 1;
+            margin-left: 15px;
+        }
+
+        .rating-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .rating-score {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* Магазин */
+        .shop-categories {
+            display: flex;
+            gap: 10px;
             margin-bottom: 20px;
-            width: fit-content;
-            margin-left: auto;
-            margin-right: auto;
+            overflow-x: auto;
+        }
+
+        .shop-category {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .shop-category.active {
+            background: rgba(255,255,255,0.4);
+        }
+
+        .shop-items {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .shop-item {
+            background: rgba(255,255,255,0.15);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .shop-item:hover {
+            transform: translateY(-2px);
+            background: rgba(255,255,255,0.25);
+        }
+
+        .shop-item-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .shop-item-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .shop-item-price {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* Колесо удачи */
+        .wheel-container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .wheel {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #ff6b6b 0deg 60deg,
+                #4ecdc4 60deg 120deg,
+                #a8e6cf 120deg 180deg,
+                #87ceeb 180deg 240deg,
+                #ffd93d 240deg 300deg,
+                #ff9ff3 300deg 360deg
+            );
+            margin: 0 auto 30px;
+            position: relative;
+            transition: transform 3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            border: 5px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+        }
+
+        .wheel::before {
+            content: '▼';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            color: white;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .wheel-prizes {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .wheel-prize {
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            font-size: 12px;
+            text-align: center;
         }
 
         .particles {
@@ -185,7 +438,7 @@
             font-size: 20px;
         }
 
-        .evolution-popup {
+        .evolution-popup, .notification-popup {
             position: fixed;
             top: 0;
             left: 0;
@@ -198,7 +451,7 @@
             z-index: 1000;
         }
 
-        .evolution-content {
+        .popup-content {
             background: rgba(255,255,255,0.1);
             backdrop-filter: blur(20px);
             border-radius: 20px;
@@ -209,10 +462,29 @@
             margin: 20px;
         }
 
-        .evolution-pet {
+        .evolution-pet, .popup-icon {
             font-size: 80px;
             margin: 20px 0;
             animation: pulse 1s infinite;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.3);
+            transform: translateX(350px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            max-width: 280px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
         }
 
         @keyframes float {
@@ -240,92 +512,155 @@
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.1); }
         }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px);
-            border-radius: 10px;
-            padding: 15px;
-            border: 1px solid rgba(255,255,255,0.3);
-            transform: translateX(350px);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="pet-name" id="petName">Мой Питомец</div>
-        <div class="pet-level" id="petLevel">Уровень 1 • Малыш</div>
-    </div>
-
-    <div class="main-container">
-        <div class="coins" id="coins">
-            🪙 <span id="coinCount">100</span>
+        <div class="pet-info">
+            <div class="pet-name" id="petName">Мой Питомец</div>
+            <div class="pet-level" id="petLevel">Уровень 1</div>
         </div>
-
-        <div class="pet-container">
-            <div class="particles" id="particles"></div>
-            <div class="pet" id="pet" onclick="petPet()">🥚</div>
-            <div class="pet-status" id="petStatus">Скоро вылупится!</div>
-        </div>
-
-        <div class="stats-container">
-            <div class="stat">
-                <span class="stat-label">🍖 Голод</span>
-                <div class="stat-bar">
-                    <div class="stat-fill hunger-fill" id="hungerBar"></div>
-                </div>
-                <span id="hungerValue">50</span>
-            </div>
-            <div class="stat">
-                <span class="stat-label">😊 Счастье</span>
-                <div class="stat-bar">
-                    <div class="stat-fill happiness-fill" id="happinessBar"></div>
-                </div>
-                <span id="happinessValue">75</span>
-            </div>
-            <div class="stat">
-                <span class="stat-label">❤️ Здоровье</span>
-                <div class="stat-bar">
-                    <div class="stat-fill health-fill" id="healthBar"></div>
-                </div>
-                <span id="healthValue">100</span>
-            </div>
-            <div class="stat">
-                <span class="stat-label">🛁 Чистота</span>
-                <div class="stat-bar">
-                    <div class="stat-fill cleanliness-fill" id="cleanlinessBar"></div>
-                </div>
-                <span id="cleanlinessValue">80</span>
-            </div>
-        </div>
-
-        <div class="actions-container">
-            <button class="action-btn" onclick="feedPet()">
-                🍖 Покормить (10🪙)
-            </button>
-            <button class="action-btn" onclick="playWithPet()">
-                🎾 Играть (5🪙)
-            </button>
-            <button class="action-btn" onclick="healPet()">
-                💊 Лечить (20🪙)
-            </button>
-            <button class="action-btn" onclick="cleanPet()">
-                🛁 Помыть (15🪙)
-            </button>
+        <div class="rating-info">
+            <div>🏆 Рейтинг</div>
+            <div id="playerRating">#42 • 1250 очков</div>
         </div>
     </div>
 
+    <div class="tabs">
+        <div class="tab active" data-tab="home">🏠 Дом</div>
+        <div class="tab" data-tab="shop">🏪 Магазин</div>
+        <div class="tab" data-tab="wheel">🎰 Удача</div>
+        <div class="tab" data-tab="rating">🏆 Рейтинг</div>
+    </div>
+
+    <!-- Дом -->
+    <div class="tab-content active" id="home">
+        <div class="main-container">
+            <div class="currency-bar">
+                <div class="currency">
+                    🪙 <span id="coinCount">100</span>
+                </div>
+                <div class="currency">
+                    💎 <span id="gemCount">5</span>
+                </div>
+                <div class="currency">
+                    🏆 <span id="ratingPoints">1250</span>
+                </div>
+            </div>
+
+            <div class="pet-container" id="petRoom">
+                <div class="room-bg" id="roomBg"></div>
+                <div class="particles" id="particles"></div>
+                <div class="pet" id="pet" onclick="petPet()">🥚</div>
+                <div class="pet-status" id="petStatus">Скоро вылупится!</div>
+                <div class="pet-ability" id="petAbility">🔮 Особая способность: Неизвестно</div>
+            </div>
+
+            <div class="stats-container">
+                <div class="stats-row">
+                    <div class="stat">
+                        <div class="stat-icon">🍖</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill hunger-fill" id="hungerBar"></div>
+                        </div>
+                        <div class="stat-value" id="hungerValue">50</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-icon">😊</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill happiness-fill" id="happinessBar"></div>
+                        </div>
+                        <div class="stat-value" id="happinessValue">75</div>
+                    </div>
+                </div>
+                <div class="stats-row">
+                    <div class="stat">
+                        <div class="stat-icon">❤️</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill health-fill" id="healthBar"></div>
+                        </div>
+                        <div class="stat-value" id="healthValue">100</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-icon">🛁</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill cleanliness-fill" id="cleanlinessBar"></div>
+                        </div>
+                        <div class="stat-value" id="cleanlinessValue">80</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions-container">
+                <button class="action-btn" onclick="feedPet()">
+                    🍖 Покормить (10🪙)
+                </button>
+                <button class="action-btn" onclick="playWithPet()">
+                    🎾 Играть (5🪙)
+                </button>
+                <button class="action-btn" onclick="healPet()">
+                    💊 Лечить (20🪙)
+                </button>
+                <button class="action-btn" onclick="cleanPet()">
+                    🛁 Помыть (15🪙)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Магазин -->
+    <div class="tab-content" id="shop">
+        <div class="main-container">
+            <div class="shop-categories">
+                <div class="shop-category active" data-category="food">🍖 Еда</div>
+                <div class="shop-category" data-category="toys">🎾 Игрушки</div>
+                <div class="shop-category" data-category="furniture">🪑 Мебель</div>
+                <div class="shop-category" data-category="decorations">🎨 Декор</div>
+            </div>
+            <div class="shop-items" id="shopItems">
+                <!-- Заполняется динамически -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Колесо удачи -->
+    <div class="tab-content" id="wheel">
+        <div class="main-container">
+            <div class="wheel-container">
+                <h3>🎰 Колесо удачи</h3>
+                <p style="opacity: 0.8; margin: 10px 0;">Крутить можно раз в день!</p>
+                <div class="wheel" id="spinWheel" onclick="spinWheel()"></div>
+                <button class="action-btn" onclick="spinWheel()" id="spinButton" style="width: 200px; margin: 0 auto;">
+                    🎰 Крутить колесо!
+                </button>
+                <div class="wheel-prizes">
+                    <div class="wheel-prize">🪙 100 монет</div>
+                    <div class="wheel-prize">💎 5 алмазов</div>
+                    <div class="wheel-prize">🎁 Сюрприз</div>
+                    <div class="wheel-prize">⚡ Бустер</div>
+                    <div class="wheel-prize">🍖 Еда</div>
+                    <div class="wheel-prize">🏆 Очки</div>
+                </div>
+                <div id="wheelCooldown" style="margin-top: 20px; opacity: 0.7;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Рейтинг -->
+    <div class="tab-content" id="rating">
+        <div class="main-container">
+            <div class="rating-container">
+                <h3 style="text-align: center; margin-bottom: 20px;">🏆 Топ игроков</h3>
+                <div id="ratingList">
+                    <!-- Заполняется динамически -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Попапы -->
     <div class="evolution-popup" id="evolutionPopup">
-        <div class="evolution-content">
+        <div class="popup-content">
             <h2>🎉 Эволюция!</h2>
             <div class="evolution-pet" id="evolutionPet">🐣</div>
             <p id="evolutionText">Ваш питомец эволюционировал!</p>
@@ -335,48 +670,154 @@
         </div>
     </div>
 
+    <div class="notification-popup" id="notificationPopup">
+        <div class="popup-content">
+            <div class="popup-icon" id="popupIcon">🎁</div>
+            <h3 id="popupTitle">Награда!</h3>
+            <p id="popupText">Вы получили награду!</p>
+            <button class="action-btn" onclick="closeNotificationPopup()" style="margin-top: 20px; width: 100%;">
+                Забрать
+            </button>
+        </div>
+    </div>
+
     <div class="notification" id="notification">
         <span id="notificationText"></span>
     </div>
 
     <script>
-        // Игровое состояние
+        // Расширенное игровое состояние
         let gameState = {
-            petStage: 0, // 0: яйцо, 1: малыш, 2: взрослый, 3: легендарный
+            petStage: 0,
             level: 1,
             coins: 100,
+            gems: 5,
+            ratingPoints: 1250,
             hunger: 50,
             happiness: 75,
             health: 100,
             cleanliness: 80,
             experience: 0,
             lastUpdate: Date.now(),
-            hatchTime: Date.now() + 30000 // Вылупится через 30 секунд
+            hatchTime: Date.now() + 30000,
+            petType: 'normal', // normal, fire, water, earth, air, magic
+            playerName: 'Игрок',
+            lastWheelSpin: 0,
+            ownedItems: [],
+            activeRoom: 'basic',
+            furniture: [],
+            achievements: []
         };
 
-        const petStages = [
-            { emoji: '🥚', name: 'Яйцо', status: 'Скоро вылупится!' },
-            { emoji: '🐣', name: 'Малыш', status: 'Изучает мир!' },
-            { emoji: '🐰', name: 'Взрослый', status: 'Полон энергии!' },
-            { emoji: '🦄', name: 'Легендарный', status: 'Магическое существо!' }
+        // Расширенные стадии питомцев с типами
+        const petTypes = {
+            normal: {
+                name: 'Обычный',
+                stages: ['🥚', '🐣', '🐰', '🐻', '🦊', '🐺', '🦁', '🐉'],
+                ability: '🔄 Быстрое восстановление',
+                bonuses: { hunger: 1.2 }
+            },
+            fire: {
+                name: 'Огненный',
+                stages: ['🥚', '🔥', '🦊', '🐅', '🦁', '🐉', '🔥🐉', '☄️'],
+                ability: '🔥 Огненная сила',
+                bonuses: { happiness: 1.3 }
+            },
+            water: {
+                name: 'Водный',
+                stages: ['🥚', '🐠', '🐙', '🐳', '🦈', '🐋', '💧🐉', '🌊'],
+                ability: '💧 Водная защита',
+                bonuses: { cleanliness: 1.4 }
+            },
+            earth: {
+                name: 'Земной',
+                stages: ['🥚', '🌱', '🐢', '🐗', '🦏', '🐘', '🌍🐉', '⛰️'],
+                ability: '🌍 Земная мощь',
+                bonuses: { health: 1.3 }
+            },
+            air: {
+                name: 'Воздушный',
+                stages: ['🥚', '🪶', '🐦', '🦅', '🦉', '🕊️', '💨🐉', '☁️'],
+                ability: '💨 Воздушная скорость',
+                bonuses: { experience: 1.5 }
+            },
+            magic: {
+                name: 'Магический',
+                stages: ['🥚', '✨', '🦄', '🔮', '🪄', '🌟', '🔮🐉', '🌈'],
+                ability: '🔮 Магическая удача',
+                bonuses: { coins: 1.4 }
+            }
+        };
+
+        // Магазин
+        const shopItems = {
+            food: [
+                { id: 'apple', name: 'Яблоко', icon: '🍎', price: 15, effect: { hunger: 20 } },
+                { id: 'cake', name: 'Торт', icon: '🎂', price: 50, effect: { hunger: 40, happiness: 20 } },
+                { id: 'meat', name: 'Мясо', icon: '🥩', price: 25, effect: { hunger: 35, health: 10 } },
+                { id: 'fish', name: 'Рыба', icon: '🐟', price: 30, effect: { hunger: 30, cleanliness: -5 } }
+            ],
+            toys: [
+                { id: 'ball', name: 'Мячик', icon: '⚽', price: 40, effect: { happiness: 25 } },
+                { id: 'robot', name: 'Робот', icon: '🤖', price: 80, effect: { happiness: 40, experience: 10 } },
+                { id: 'book', name: 'Книга', icon: '📚', price: 60, effect: { happiness: 20, experience: 15 } }
+            ],
+            furniture: [
+                { id: 'bed', name: 'Кроватка', icon: '🛏️', price: 150, type: 'furniture' },
+                { id: 'chair', name: 'Стульчик', icon: '🪑', price: 100, type: 'furniture' },
+                { id: 'table', name: 'Столик', icon: '🪞', price: 120, type: 'furniture' }
+            ],
+            decorations: [
+                { id: 'flowers', name: 'Цветы', icon: '🌸', price: 75, type: 'decoration' },
+                { id: 'painting', name: 'Картина', icon: '🖼️', price: 200, type: 'decoration' },
+                { id: 'lamp', name: 'Лампа', icon: '💡', price: 90, type: 'decoration' }
+            ]
+        };
+
+        // Рейтинг (симуляция)
+        const topPlayers = [
+            { name: 'DragonMaster', score: 15420, level: 85 },
+            { name: 'PetLover99', score: 12350, level: 72 },
+            { name: 'FireKing', score: 10890, level: 65 },
+            { name: 'MagicGirl', score: 9760, level: 58 },
+            { name: 'WaterSpirit', score: 8540, level: 51 },
+            { name: 'EarthGuard', score: 7320, level: 45 },
+            { name: 'AirDancer', score: 6100, level: 38 },
+            { name: 'StarSeeker', score: 4980, level: 32 }
         ];
-
-        const statusMessages = {
-            excellent: ['Превосходно себя чувствует!', 'В отличном настроении!', 'Сияет от счастья!'],
-            good: ['Хорошо себя чувствует', 'Довольный и веселый', 'Активный и игривый'],
-            okay: ['Нормальное состояние', 'Немного устал', 'Может быть лучше'],
-            poor: ['Плохо себя чувствует', 'Грустный и вялый', 'Нуждается в уходе!'],
-            critical: ['Критическое состояние!', 'Очень плохо!', 'Срочно нужна помощь!']
-        };
 
         // Инициализация Telegram Web App
         if (window.Telegram?.WebApp) {
             window.Telegram.WebApp.ready();
             window.Telegram.WebApp.expand();
             
-            // Включаем тактильную обратную связь
-            window.Telegram.WebApp.HapticFeedback?.impactOccurred('light');
+            // Получаем имя пользователя
+            if (window.Telegram.WebApp.initDataUnsafe?.user?.first_name) {
+                gameState.playerName = window.Telegram.WebApp.initDataUnsafe.user.first_name;
+            }
         }
+
+        // Переключение табов
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.dataset.tab;
+                
+                // Убираем активные классы
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+                
+                // Добавляем активные классы
+                tab.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+                
+                // Обновляем контент для специфичных табов
+                if (targetTab === 'shop') updateShop();
+                if (targetTab === 'rating') updateRating();
+                if (targetTab === 'wheel') updateWheel();
+                
+                hapticFeedback();
+            });
+        });
 
         // Загрузка игры
         function initGame() {
@@ -385,12 +826,23 @@
                 const savedState = JSON.parse(saved);
                 gameState = { ...gameState, ...savedState };
                 
+                // Определяем тип питомца случайно если не установлен
+                if (!gameState.petType) {
+                    const types = Object.keys(petTypes);
+                    gameState.petType = types[Math.floor(Math.random() * types.length)];
+                }
+                
                 // Обновляем состояние за время отсутствия
                 const timePassed = Date.now() - gameState.lastUpdate;
                 updateStatsOverTime(timePassed);
+            } else {
+                // Новая игра - выбираем случайный тип питомца
+                const types = Object.keys(petTypes);
+                gameState.petType = types[Math.floor(Math.random() * types.length)];
             }
             
             updateDisplay();
+            updateShop();
             startGameLoop();
         }
 
@@ -414,16 +866,28 @@
                     evolvePet(1);
                 }
 
-                // Естественное снижение показателей
+                // Естественное снижение показателей с бонусами типа
                 if (gameState.petStage > 0) {
-                    gameState.hunger = Math.max(0, gameState.hunger - 0.1);
-                    gameState.happiness = Math.max(0, gameState.happiness - 0.05);
-                    gameState.cleanliness = Math.max(0, gameState.cleanliness - 0.03);
+                    const typeData = petTypes[gameState.petType];
+                    
+                    gameState.hunger = Math.max(0, gameState.hunger - (0.1 / (typeData.bonuses.hunger || 1)));
+                    gameState.happiness = Math.max(0, gameState.happiness - (0.05 / (typeData.bonuses.happiness || 1)));
+                    gameState.cleanliness = Math.max(0, gameState.cleanliness - (0.03 / (typeData.bonuses.cleanliness || 1)));
                     
                     // Здоровье падает если другие показатели низкие
                     const avgStat = (gameState.hunger + gameState.happiness + gameState.cleanliness) / 3;
                     if (avgStat < 30) {
-                        gameState.health = Math.max(0, gameState.health - 0.1);
+                        gameState.health = Math.max(0, gameState.health - (0.1 / (typeData.bonuses.health || 1)));
+                    }
+                    
+                    // Автоматический заработок монет
+                    if (Math.random() < 0.01) {
+                        const coinBonus = typeData.bonuses.coins || 1;
+                        const earnings = Math.floor((Math.random() * 3 + 1) * coinBonus);
+                        gameState.coins += earnings;
+                        if (Math.random() < 0.3) {
+                            showNotification(`Найдено ${earnings} монет! 🪙`);
+                        }
                     }
                 }
 
@@ -438,11 +902,16 @@
         // Проверка эволюции
         function checkEvolution() {
             const avgStat = (gameState.hunger + gameState.happiness + gameState.health + gameState.cleanliness) / 4;
+            const maxStage = petTypes[gameState.petType].stages.length - 1;
             
-            if (gameState.petStage === 1 && avgStat > 80 && gameState.experience >= 100) {
-                evolvePet(2);
-            } else if (gameState.petStage === 2 && avgStat > 90 && gameState.experience >= 500) {
-                evolvePet(3);
+            // Условия для эволюции становятся сложнее
+            const requiredExperience = gameState.petStage * 150 + 50;
+            const requiredStats = 70 + gameState.petStage * 5;
+            
+            if (gameState.petStage < maxStage && 
+                avgStat > requiredStats && 
+                gameState.experience >= requiredExperience) {
+                evolvePet(gameState.petStage + 1);
             }
         }
 
@@ -450,11 +919,21 @@
         function evolvePet(newStage) {
             gameState.petStage = newStage;
             gameState.level++;
+            gameState.ratingPoints += 100 * newStage;
             
-            const stage = petStages[newStage];
-            document.getElementById('evolutionPet').textContent = stage.emoji;
-            document.getElementById('evolutionText').textContent = `Поздравляем! Ваш питомец стал: ${stage.name}!`;
+            const typeData = petTypes[gameState.petType];
+            const newEmoji = typeData.stages[newStage];
+            const stageName = `${typeData.name} (Стадия ${newStage})`;
+            
+            document.getElementById('evolutionPet').textContent = newEmoji;
+            document.getElementById('evolutionText').textContent = `Поздравляем! Ваш питомец эволюционировал в: ${stageName}!`;
             document.getElementById('evolutionPopup').style.display = 'flex';
+            
+            // Особые награды за эволюцию
+            if (newStage >= 5) {
+                gameState.gems += newStage;
+                showNotification(`Получено ${newStage} алмазов за эволюцию! 💎`);
+            }
             
             if (window.Telegram?.WebApp?.HapticFeedback) {
                 window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
@@ -466,12 +945,17 @@
             document.getElementById('evolutionPopup').style.display = 'none';
         }
 
+        function closeNotificationPopup() {
+            document.getElementById('notificationPopup').style.display = 'none';
+        }
+
         // Действия с питомцем
         function feedPet() {
             if (gameState.coins >= 10 && gameState.hunger < 100) {
                 gameState.coins -= 10;
                 gameState.hunger = Math.min(100, gameState.hunger + 25);
-                gameState.experience += 5;
+                gameState.experience += Math.floor(5 * (petTypes[gameState.petType].bonuses.experience || 1));
+                gameState.ratingPoints += 5;
                 animatePet();
                 createParticles(['🍖', '😋', '❤️']);
                 showNotification('Питомец покормлен! +25 сытости');
@@ -483,8 +967,9 @@
             if (gameState.coins >= 5 && gameState.happiness < 100) {
                 gameState.coins -= 5;
                 gameState.happiness = Math.min(100, gameState.happiness + 30);
-                gameState.experience += 8;
+                gameState.experience += Math.floor(8 * (petTypes[gameState.petType].bonuses.experience || 1));
                 gameState.cleanliness = Math.max(0, gameState.cleanliness - 5);
+                gameState.ratingPoints += 8;
                 animatePet();
                 createParticles(['🎾', '😄', '⭐']);
                 showNotification('Весело поиграли! +30 счастья');
@@ -496,7 +981,8 @@
             if (gameState.coins >= 20 && gameState.health < 100) {
                 gameState.coins -= 20;
                 gameState.health = Math.min(100, gameState.health + 40);
-                gameState.experience += 3;
+                gameState.experience += Math.floor(3 * (petTypes[gameState.petType].bonuses.experience || 1));
+                gameState.ratingPoints += 3;
                 animatePet();
                 createParticles(['💊', '✨', '💚']);
                 showNotification('Питомец вылечен! +40 здоровья');
@@ -509,7 +995,8 @@
                 gameState.coins -= 15;
                 gameState.cleanliness = Math.min(100, gameState.cleanliness + 35);
                 gameState.happiness = Math.min(100, gameState.happiness + 10);
-                gameState.experience += 5;
+                gameState.experience += Math.floor(5 * (petTypes[gameState.petType].bonuses.experience || 1));
+                gameState.ratingPoints += 5;
                 animatePet();
                 createParticles(['🛁', '✨', '🧼']);
                 showNotification('Питомец чистый! +35 чистоты');
@@ -517,21 +1004,25 @@
             }
         }
 
-        // Поглаживание питомца
+        // Поглаживание питомца (исправлен баг с подсветкой)
         function petPet() {
             if (gameState.petStage > 0) {
                 gameState.happiness = Math.min(100, gameState.happiness + 2);
-                gameState.experience += 1;
+                gameState.experience += Math.floor(1 * (petTypes[gameState.petType].bonuses.experience || 1));
+                gameState.ratingPoints += 1;
                 animatePet();
                 createParticles(['❤️', '😊']);
                 hapticFeedback();
             }
         }
 
-        // Анимация питомца
+        // Анимация питомца (исправлена)
         function animatePet() {
             const pet = document.getElementById('pet');
-            pet.classList.add('happy');
+            pet.classList.remove('happy'); // Убираем предыдущую анимацию
+            setTimeout(() => {
+                pet.classList.add('happy');
+            }, 10);
             setTimeout(() => pet.classList.remove('happy'), 600);
         }
 
@@ -539,19 +1030,213 @@
         function createParticles(emojis) {
             const container = document.getElementById('particles');
             const petRect = document.getElementById('pet').getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
             
             emojis.forEach((emoji, i) => {
                 setTimeout(() => {
                     const particle = document.createElement('div');
                     particle.className = 'particle';
                     particle.textContent = emoji;
-                    particle.style.left = (petRect.left + petRect.width / 2 - 10 + (Math.random() - 0.5) * 60) + 'px';
-                    particle.style.top = (petRect.top + petRect.height / 2 - 10) + 'px';
+                    particle.style.left = (petRect.left - containerRect.left + petRect.width / 2 - 10 + (Math.random() - 0.5) * 60) + 'px';
+                    particle.style.top = (petRect.top - containerRect.top + petRect.height / 2 - 10) + 'px';
                     container.appendChild(particle);
                     
                     setTimeout(() => particle.remove(), 2000);
                 }, i * 200);
             });
+        }
+
+        // Колесо удачи
+        function spinWheel() {
+            const now = Date.now();
+            const cooldown = 24 * 60 * 60 * 1000; // 24 часа
+            
+            if (now - gameState.lastWheelSpin < cooldown) {
+                const remaining = cooldown - (now - gameState.lastWheelSpin);
+                const hours = Math.ceil(remaining / (60 * 60 * 1000));
+                showNotification(`Можно крутить через ${hours} часов!`);
+                return;
+            }
+            
+            const wheel = document.getElementById('spinWheel');
+            const button = document.getElementById('spinButton');
+            
+            button.disabled = true;
+            
+            // Случайный поворот
+            const spins = 5 + Math.random() * 5;
+            const finalAngle = spins * 360 + Math.random() * 360;
+            
+            wheel.style.transform = `rotate(${finalAngle}deg)`;
+            
+            setTimeout(() => {
+                // Определяем награду по углу
+                const normalizedAngle = (finalAngle % 360);
+                const sector = Math.floor(normalizedAngle / 60);
+                
+                const prizes = [
+                    { icon: '🪙', text: 'получили 100 монет!', reward: { coins: 100 } },
+                    { icon: '💎', text: 'получили 5 алмазов!', reward: { gems: 5 } },
+                    { icon: '🎁', text: 'получили сюрприз!', reward: { coins: 50, gems: 2 } },
+                    { icon: '⚡', text: 'получили бустер!', reward: { experience: 50 } },
+                    { icon: '🍖', text: 'получили еду!', reward: { hunger: 30 } },
+                    { icon: '🏆', text: 'получили очки рейтинга!', reward: { ratingPoints: 200 } }
+                ];
+                
+                const prize = prizes[sector];
+                
+                // Применяем награду
+                if (prize.reward.coins) gameState.coins += prize.reward.coins;
+                if (prize.reward.gems) gameState.gems += prize.reward.gems;
+                if (prize.reward.experience) gameState.experience += prize.reward.experience;
+                if (prize.reward.hunger) gameState.hunger = Math.min(100, gameState.hunger + prize.reward.hunger);
+                if (prize.reward.ratingPoints) gameState.ratingPoints += prize.reward.ratingPoints;
+                
+                // Показываем результат
+                document.getElementById('popupIcon').textContent = prize.icon;
+                document.getElementById('popupTitle').textContent = 'Поздравляем!';
+                document.getElementById('popupText').textContent = `Вы ${prize.text}`;
+                document.getElementById('notificationPopup').style.display = 'flex';
+                
+                gameState.lastWheelSpin = now;
+                button.disabled = false;
+                
+                updateDisplay();
+                hapticFeedback();
+            }, 3000);
+        }
+
+        // Обновление магазина
+        function updateShop() {
+            const shopContainer = document.getElementById('shopItems');
+            const categories = document.querySelectorAll('.shop-category');
+            
+            categories.forEach(cat => {
+                cat.addEventListener('click', () => {
+                    categories.forEach(c => c.classList.remove('active'));
+                    cat.classList.add('active');
+                    displayShopItems(cat.dataset.category);
+                });
+            });
+            
+            displayShopItems('food'); // Показываем еду по умолчанию
+        }
+
+        function displayShopItems(category) {
+            const shopContainer = document.getElementById('shopItems');
+            const items = shopItems[category] || [];
+            
+            shopContainer.innerHTML = items.map(item => `
+                <div class="shop-item" onclick="buyItem('${item.id}', '${category}')">
+                    <div class="shop-item-icon">${item.icon}</div>
+                    <div class="shop-item-name">${item.name}</div>
+                    <div class="shop-item-price">${item.price} 🪙</div>
+                </div>
+            `).join('');
+        }
+
+        function buyItem(itemId, category) {
+            const item = shopItems[category].find(i => i.id === itemId);
+            if (!item) return;
+            
+            if (gameState.coins >= item.price) {
+                gameState.coins -= item.price;
+                
+                // Применяем эффект предмета
+                if (item.effect) {
+                    Object.keys(item.effect).forEach(stat => {
+                        if (gameState[stat] !== undefined) {
+                            gameState[stat] = Math.max(0, Math.min(100, gameState[stat] + item.effect[stat]));
+                        }
+                    });
+                }
+                
+                // Добавляем в инвентарь если это мебель/декор
+                if (item.type) {
+                    gameState.ownedItems.push(itemId);
+                    updateRoom();
+                }
+                
+                gameState.ratingPoints += Math.floor(item.price / 10);
+                showNotification(`Куплено: ${item.name}!`);
+                updateDisplay();
+                hapticFeedback();
+            } else {
+                showNotification('Недостаточно монет!');
+            }
+        }
+
+        // Обновление комнаты
+        function updateRoom() {
+            const roomBg = document.getElementById('roomBg');
+            const petContainer = document.getElementById('petRoom');
+            
+            // Убираем старую мебель
+            petContainer.querySelectorAll('.room-furniture').forEach(f => f.remove());
+            
+            // Добавляем новую мебель
+            gameState.ownedItems.forEach(itemId => {
+                const item = Object.values(shopItems).flat().find(i => i.id === itemId);
+                if (item && item.type) {
+                    const furniture = document.createElement('div');
+                    furniture.className = 'room-furniture';
+                    furniture.textContent = item.icon;
+                    furniture.style.left = Math.random() * 60 + 20 + '%';
+                    furniture.style.top = Math.random() * 40 + 50 + '%';
+                    petContainer.appendChild(furniture);
+                }
+            });
+        }
+
+        // Обновление рейтинга
+        function updateRating() {
+            const ratingList = document.getElementById('ratingList');
+            
+            // Добавляем игрока в список
+            const playerRating = {
+                name: gameState.playerName,
+                score: gameState.ratingPoints,
+                level: gameState.level
+            };
+            
+            const allPlayers = [...topPlayers, playerRating]
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 10);
+            
+            ratingList.innerHTML = allPlayers.map((player, index) => `
+                <div class="rating-item ${player.name === gameState.playerName ? 'own' : ''}">
+                    <div class="rating-position">${index + 1}</div>
+                    <div class="rating-info-item">
+                        <div class="rating-name">${player.name}</div>
+                        <div class="rating-score">Уровень ${player.level} • ${player.score} очков</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Обновляем позицию игрока в шапке
+            const playerPosition = allPlayers.findIndex(p => p.name === gameState.playerName) + 1;
+            document.getElementById('playerRating').textContent = `#${playerPosition} • ${gameState.ratingPoints} очков`;
+        }
+
+        // Обновление колеса
+        function updateWheel() {
+            const now = Date.now();
+            const cooldown = 24 * 60 * 60 * 1000; // 24 часа
+            const remaining = cooldown - (now - gameState.lastWheelSpin);
+            const cooldownEl = document.getElementById('wheelCooldown');
+            const spinButton = document.getElementById('spinButton');
+            
+            if (remaining > 0) {
+                const hours = Math.floor(remaining / (60 * 60 * 1000));
+                const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+                cooldownEl.textContent = `Следующее вращение через: ${hours}ч ${minutes}м`;
+                spinButton.disabled = true;
+                spinButton.textContent = '⏰ Ожидание...';
+            } else {
+                cooldownEl.textContent = '';
+                spinButton.disabled = false;
+                spinButton.textContent = '🎰 Крутить колесо!';
+            }
         }
 
         // Уведомления
@@ -575,25 +1260,30 @@
 
         // Обновление интерфейса
         function updateDisplay() {
-            const stage = petStages[gameState.petStage];
+            const typeData = petTypes[gameState.petType];
+            const petEmoji = typeData.stages[gameState.petStage];
             
             // Основная информация
-            document.getElementById('pet').textContent = stage.emoji;
-            document.getElementById('petName').textContent = stage.name;
+            document.getElementById('pet').textContent = petEmoji;
+            document.getElementById('petName').textContent = `${typeData.name} питомец`;
             document.getElementById('petLevel').textContent = `Уровень ${gameState.level} • Опыт: ${gameState.experience}`;
             document.getElementById('coinCount').textContent = gameState.coins;
+            document.getElementById('gemCount').textContent = gameState.gems;
+            document.getElementById('ratingPoints').textContent = gameState.ratingPoints;
+            
+            // Способность питомца
+            document.getElementById('petAbility').textContent = `${typeData.ability}`;
             
             // Статус питомца
             const avgStat = (gameState.hunger + gameState.happiness + gameState.health + gameState.cleanliness) / 4;
-            let statusCategory;
-            if (avgStat >= 80) statusCategory = 'excellent';
-            else if (avgStat >= 60) statusCategory = 'good';
-            else if (avgStat >= 40) statusCategory = 'okay';
-            else if (avgStat >= 20) statusCategory = 'poor';
-            else statusCategory = 'critical';
+            let status;
+            if (avgStat >= 80) status = 'Превосходно себя чувствует!';
+            else if (avgStat >= 60) status = 'Хорошо себя чувствует';
+            else if (avgStat >= 40) status = 'Нормальное состояние';
+            else if (avgStat >= 20) status = 'Плохо себя чувствует';
+            else status = 'Критическое состояние!';
             
-            const randomStatus = statusMessages[statusCategory][Math.floor(Math.random() * statusMessages[statusCategory].length)];
-            document.getElementById('petStatus').textContent = randomStatus;
+            document.getElementById('petStatus').textContent = status;
             
             // Статистики
             updateStat('hunger', gameState.hunger);
@@ -616,7 +1306,7 @@
         }
 
         function updateActionButtons() {
-            const buttons = document.querySelectorAll('.action-btn');
+            const buttons = document.querySelectorAll('#home .action-btn');
             const costs = [10, 5, 20, 15];
             const stats = [gameState.hunger, gameState.happiness, gameState.health, gameState.cleanliness];
             
@@ -636,16 +1326,3 @@
 
         // Запуск игры
         initGame();
-
-        // Автоматическое получение монет каждые 30 секунд
-        setInterval(() => {
-            if (gameState.petStage > 0) {
-                gameState.coins += Math.floor(Math.random() * 5) + 1;
-                if (Math.random() < 0.3) {
-                    showNotification(`Найдено ${Math.floor(Math.random() * 5) + 1} монет! 🪙`);
-                }
-            }
-        }, 30000);
-    </script>
-</body>
-</html>
