@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pocket Pet</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <style>
         * {
             margin: 0;
@@ -686,6 +690,32 @@
     </div>
 
     <script>
+        // Firebase конфигурация (замените на свою!)
+        const firebaseConfig = {
+            apiKey: "demo-api-key",
+            authDomain: "pocket-pet-demo.firebaseapp.com",
+            projectId: "pocket-pet-demo",
+            storageBucket: "pocket-pet-demo.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef123456"
+        };
+
+        // Инициализация Firebase (с проверкой на ошибки)
+        let db = null;
+        let firebaseEnabled = false;
+
+        try {
+            if (typeof firebase !== 'undefined') {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                firebaseEnabled = true;
+                console.log('Firebase подключен успешно!');
+            }
+        } catch (error) {
+            console.log('Firebase не подключен, работаем в автономном режиме:', error);
+            firebaseEnabled = false;
+        }
+
         // Расширенное игровое состояние
         let gameState = {
             petStage: 0,
@@ -702,6 +732,7 @@
             hatchTime: Date.now() + 30000,
             petType: 'normal', // normal, fire, water, earth, air, magic
             playerName: 'Игрок',
+            playerId: null, // Уникальный ID игрока из Telegram
             lastWheelSpin: 0,
             ownedItems: [],
             activeRoom: 'basic',
@@ -774,27 +805,99 @@
             ]
         };
 
-        // Рейтинг (симуляция)
-        const topPlayers = [
-            { name: 'DragonMaster', score: 15420, level: 85 },
-            { name: 'PetLover99', score: 12350, level: 72 },
-            { name: 'FireKing', score: 10890, level: 65 },
-            { name: 'MagicGirl', score: 9760, level: 58 },
-            { name: 'WaterSpirit', score: 8540, level: 51 },
-            { name: 'EarthGuard', score: 7320, level: 45 },
-            { name: 'AirDancer', score: 6100, level: 38 },
-            { name: 'StarSeeker', score: 4980, level: 32 }
-        ];
+        // Реальная система рейтинга с Firebase
+        async function updatePlayerRating() {
+            if (!firebaseEnabled || !gameState.playerId) return;
+
+            try {
+                await db.collection('players').doc(gameState.playerId).set({
+                    name: gameState.playerName,
+                    score: gameState.ratingPoints,
+                    level: gameState.level,
+                    petType: gameState.petType,
+                    petStage: gameState.petStage,
+                    lastUpdate: Date.now()
+                }, { merge: true });
+                
+                console.log('Рейтинг обновлён успешно!');
+            } catch (error) {
+                console.error('Ошибка обновления рейтинга:', error);
+            }
+        }
+
+        async function loadRealRating() {
+            if (!firebaseEnabled) {
+                // Если Firebase недоступен, показываем демо-данные
+                return getFakeRatingData();
+            }
+
+            try {
+                const snapshot = await db.collection('players')
+                    .orderBy('score', 'desc')
+                    .limit(50)
+                    .get();
+
+                const players = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    players.push({
+                        id: doc.id,
+                        name: data.name || 'Аноним',
+                        score: data.score || 0,
+                        level: data.level || 1,
+                        petType: data.petType || 'normal',
+                        petStage: data.petStage || 0
+                    });
+                });
+
+                return players;
+            } catch (error) {
+                console.error('Ошибка загрузки рейтинга:', error);
+                return getFakeRatingData();
+            }
+        }
+
+        function getFakeRatingData() {
+            // Резервные данные если Firebase не работает
+            const fakeTopPlayers = [
+                { name: 'DragonMaster', score: 15420, level: 85 },
+                { name: 'PetLover99', score: 12350, level: 72 },
+                { name: 'FireKing', score: 10890, level: 65 },
+                { name: 'MagicGirl', score: 9760, level: 58 },
+                { name: 'WaterSpirit', score: 8540, level: 51 },
+                { name: 'EarthGuard', score: 7320, level: 45 }
+            ];
+
+            // Добавляем текущего игрока
+            const playerData = {
+                id: gameState.playerId,
+                name: gameState.playerName,
+                score: gameState.ratingPoints,
+                level: gameState.level
+            };
+
+            return [...fakeTopPlayers, playerData]
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 20);
+        }
 
         // Инициализация Telegram Web App
         if (window.Telegram?.WebApp) {
             window.Telegram.WebApp.ready();
             window.Telegram.WebApp.expand();
             
-            // Получаем имя пользователя
-            if (window.Telegram.WebApp.initDataUnsafe?.user?.first_name) {
-                gameState.playerName = window.Telegram.WebApp.initDataUnsafe.user.first_name;
+            // Получаем данные пользователя из Telegram
+            const user = window.Telegram.WebApp.initDataUnsafe?.user;
+            if (user) {
+                gameState.playerName = user.first_name || 'Игрок';
+                gameState.playerId = user.id.toString();
+            } else {
+                // Если нет данных пользователя, создаём уникальный ID
+                gameState.playerId = 'player_' + Math.random().toString(36).substr(2, 9);
             }
+        } else {
+            // Для тестирования вне Telegram
+            gameState.playerId = 'player_' + Math.random().toString(36).substr(2, 9);
         }
 
         // Переключение табов
@@ -949,7 +1052,7 @@
             document.getElementById('notificationPopup').style.display = 'none';
         }
 
-        // Действия с питомцем
+        // Действия с питомцем (обновлённые с рейтингом)
         function feedPet() {
             if (gameState.coins >= 10 && gameState.hunger < 100) {
                 gameState.coins -= 10;
@@ -960,6 +1063,10 @@
                 createParticles(['🍖', '😋', '❤️']);
                 showNotification('Питомец покормлен! +25 сытости');
                 hapticFeedback();
+                
+                // Обновляем рейтинг в облаке (с задержкой чтобы не спамить)
+                clearTimeout(window.ratingUpdateTimeout);
+                window.ratingUpdateTimeout = setTimeout(updatePlayerRating, 2000);
             }
         }
 
@@ -974,6 +1081,9 @@
                 createParticles(['🎾', '😄', '⭐']);
                 showNotification('Весело поиграли! +30 счастья');
                 hapticFeedback();
+                
+                clearTimeout(window.ratingUpdateTimeout);
+                window.ratingUpdateTimeout = setTimeout(updatePlayerRating, 2000);
             }
         }
 
@@ -987,6 +1097,9 @@
                 createParticles(['💊', '✨', '💚']);
                 showNotification('Питомец вылечен! +40 здоровья');
                 hapticFeedback();
+                
+                clearTimeout(window.ratingUpdateTimeout);
+                window.ratingUpdateTimeout = setTimeout(updatePlayerRating, 2000);
             }
         }
 
@@ -1001,6 +1114,9 @@
                 createParticles(['🛁', '✨', '🧼']);
                 showNotification('Питомец чистый! +35 чистоты');
                 hapticFeedback();
+                
+                clearTimeout(window.ratingUpdateTimeout);
+                window.ratingUpdateTimeout = setTimeout(updatePlayerRating, 2000);
             }
         }
 
@@ -1188,34 +1304,66 @@
             });
         }
 
-        // Обновление рейтинга
-        function updateRating() {
+        // Обновление рейтинга (теперь с реальными данными)
+        async function updateRating() {
             const ratingList = document.getElementById('ratingList');
             
-            // Добавляем игрока в список
-            const playerRating = {
-                name: gameState.playerName,
-                score: gameState.ratingPoints,
-                level: gameState.level
-            };
-            
-            const allPlayers = [...topPlayers, playerRating]
-                .sort((a, b) => b.score - a.score)
-                .slice(0, 10);
-            
-            ratingList.innerHTML = allPlayers.map((player, index) => `
-                <div class="rating-item ${player.name === gameState.playerName ? 'own' : ''}">
-                    <div class="rating-position">${index + 1}</div>
-                    <div class="rating-info-item">
-                        <div class="rating-name">${player.name}</div>
-                        <div class="rating-score">Уровень ${player.level} • ${player.score} очков</div>
-                    </div>
+            // Показываем загрузку
+            ratingList.innerHTML = `
+                <div style="text-align: center; padding: 40px; opacity: 0.7;">
+                    <div style="font-size: 30px; margin-bottom: 10px;">⏳</div>
+                    <div>Загружаем рейтинг...</div>
                 </div>
-            `).join('');
+            `;
             
-            // Обновляем позицию игрока в шапке
-            const playerPosition = allPlayers.findIndex(p => p.name === gameState.playerName) + 1;
-            document.getElementById('playerRating').textContent = `#${playerPosition} • ${gameState.ratingPoints} очков`;
+            try {
+                const allPlayers = await loadRealRating();
+                
+                if (allPlayers.length === 0) {
+                    ratingList.innerHTML = `
+                        <div style="text-align: center; padding: 40px; opacity: 0.7;">
+                            <div style="font-size: 30px; margin-bottom: 10px;">🏆</div>
+                            <div>Станьте первым в рейтинге!</div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                ratingList.innerHTML = allPlayers.slice(0, 20).map((player, index) => {
+                    const isCurrentPlayer = player.id === gameState.playerId || player.name === gameState.playerName;
+                    const petTypeData = petTypes[player.petType || 'normal'];
+                    const petEmoji = petTypeData ? petTypeData.stages[Math.min(player.petStage || 0, petTypeData.stages.length - 1)] : '🐰';
+                    
+                    return `
+                        <div class="rating-item ${isCurrentPlayer ? 'own' : ''}">
+                            <div class="rating-position">${index + 1}</div>
+                            <div class="rating-info-item">
+                                <div class="rating-name">${petEmoji} ${player.name}</div>
+                                <div class="rating-score">Уровень ${player.level} • ${player.score} очков</div>
+                            </div>
+                            ${isCurrentPlayer ? '<div style="font-size: 20px;">👑</div>' : ''}
+                        </div>
+                    `;
+                }).join('');
+                
+                // Обновляем позицию игрока в шапке
+                const playerPosition = allPlayers.findIndex(p => 
+                    p.id === gameState.playerId || p.name === gameState.playerName
+                ) + 1;
+                
+                const positionText = playerPosition > 0 ? `#${playerPosition}` : '#???';
+                document.getElementById('playerRating').textContent = `${positionText} • ${gameState.ratingPoints} очков`;
+                
+            } catch (error) {
+                console.error('Ошибка обновления рейтинга:', error);
+                ratingList.innerHTML = `
+                    <div style="text-align: center; padding: 40px; opacity: 0.7;">
+                        <div style="font-size: 30px; margin-bottom: 10px;">⚠️</div>
+                        <div>Ошибка загрузки рейтинга</div>
+                        <div style="font-size: 12px; margin-top: 10px;">Попробуйте позже</div>
+                    </div>
+                `;
+            }
         }
 
         // Обновление колеса
