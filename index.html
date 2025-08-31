@@ -826,9 +826,7 @@
                     telegramId: gameState.playerId,
                     username: window.Telegram?.WebApp?.initDataUnsafe?.user?.username || 'unknown',
                     first_name: window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name || 'Player'
-                }, 
-
-                await db.collection('players').doc(gameState.playerId).set(playerData, { merge: true });
+                }, { merge: true });
                 
                 console.log('Рейтинг обновлён успешно!');
             } catch (error) {
