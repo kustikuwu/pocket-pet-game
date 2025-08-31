@@ -822,8 +822,11 @@
 
         // Реальная система рейтинга с Firebase
         async function updatePlayerRating() {
-            if (!firebaseEnabled || !gameState.playerId) return;
-
+            if (!firebaseEnabled || !gameState.playerId) {
+                console.log('Firebase не доступен для обновления рейтинга');
+                return;
+            }
+        
             try {
                 await db.collection('players').doc(gameState.playerId).set({
                     name: gameState.playerName,
@@ -840,35 +843,36 @@
                 console.log('Рейтинг обновлён успешно!');
             } catch (error) {
                 console.error('Ошибка обновления рейтинга:', error);
+                // Продолжаем работу в оффлайн-режиме
             }
         }
-
+        
         async function loadRealRating() {
             if (!firebaseEnabled) {
-                // Если Firebase недоступен, показываем демо-данные
+                console.log('Firebase недоступен, используем демо-данные');
                 return getFakeRatingData();
             }
-
+        
             try {
                 const snapshot = await db.collection('players')
                     .orderBy('score', 'desc')
                     .limit(50)
                     .get();
-
+        
                 const players = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     players.push({
                         id: doc.id,
                         name: data.name || 'Аноним',
-                        score: data.score || 0,
+                       score: data.score || 0,
                         level: data.level || 1,
                         petType: data.petType || 'normal',
                         petStage: data.petStage || 0,
                         username: data.username || ''
                     });
                 });
-
+        
                 return players;
             } catch (error) {
                 console.error('Ошибка загрузки рейтинга:', error);
@@ -1431,7 +1435,11 @@
         // Тактильная обратная связь
         function hapticFeedback() {
             if (window.Telegram?.WebApp?.HapticFeedback) {
-                window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                try {
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                } catch (error) {
+                    console.log('Haptic feedback не поддерживается:', error);
+                }
             }
         }
 
