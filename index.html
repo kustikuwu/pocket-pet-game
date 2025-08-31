@@ -691,6 +691,7 @@
 
     <script>
         // Firebase конфигурация (замените на свою!)
+        // Firebase конфигурация
         const firebaseConfig = {
             apiKey: "AIzaSyDkURLZIwVQ41iXz3LRJFIvNaHoX1zzNtE",
             authDomain: "basedanih-70a2e.firebaseapp.com",
@@ -700,22 +701,30 @@
             appId: "1:473558687341:web:2bb509c757efc788afa964",
             measurementId: "G-QE2FJJP96Y"
         };
-
-        // Инициализация Firebase (с проверкой на ошибки)
+        
+        // Инициализация Firebase с улучшенной обработкой ошибок
         let db = null;
         let firebaseEnabled = false;
-
+        
         try {
             if (typeof firebase !== 'undefined') {
-                firebase.initializeApp(firebaseConfig);
+                // Проверяем, не была ли уже инициализирована Firebase
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
                 db = firebase.firestore();
                 firebaseEnabled = true;
                 console.log('Firebase подключен успешно!');
-
-                db.enablePersistence()
-                    .catch((err) => {
-                       console.log('Оффлайн режим не поддерживается:', err);
-                    });
+        
+                // Пробуем включить persistence, но не блокируем приложение при ошибке
+                try {
+                    db.enablePersistence()
+                        .catch((err) => {
+                            console.log('Оффлайн режим не поддерживается:', err);
+                        });
+                } catch (persistenceError) {
+                    console.log('Ошибка persistence:', persistenceError);
+                }
             }
         } catch (error) {
             console.log('Firebase не подключен, работаем в автономном режиме:', error);
